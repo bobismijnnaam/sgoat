@@ -61,8 +61,8 @@ public:
     int logic();
     int render();
 
-    int diff; // In deze pointer kun je een array aan variabelen opslaan die je in elke state wilt kunnen gebruiken.
-    bool snd;
+    int lvl; // Level keuze
+    bool snd; // Geluid
 
     GameManStates state;
     int stateTime;

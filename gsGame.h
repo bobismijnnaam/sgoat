@@ -2,10 +2,11 @@
 #define GSGAME_H
 
 #include "gamestate.h"
+#include "cPlayer.h"
 
 class gsGame : public cGameState {
 public:
-    gsGame();
+    gsGame(int flvl);
     ~gsGame();
 
     int events();
@@ -13,6 +14,9 @@ public:
     int render(SDL_Surface* dst);
 
 private:
+    int lvl;
+
+    cPlayer* player;
 
 } ;
 

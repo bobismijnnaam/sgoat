@@ -28,7 +28,7 @@ cGameMan::cGameMan(GameStates startState) {
         this->currState = new gsLvlSelect();
         break;
     case STATE_GAME:
-        this->currState = new gsGame();
+        this->currState = new gsGame(lvl);
         break;
     case STATE_EXIT:
         this->currState = new gsIntro();
@@ -41,7 +41,7 @@ cGameMan::cGameMan(GameStates startState) {
     this->stateID = startState;
     this->nextState = STATE_NULL;
 
-    diff = 2;
+    lvl = 1;
     snd = true;
 
     state = STATE_RUNNING;
@@ -86,7 +86,7 @@ int cGameMan::changeState() {
                 this->currState = new gsLvlSelect();
                 break;
             case STATE_GAME:
-                this->currState = new gsGame();
+                this->currState = new gsGame(lvl);
                 break;
             case STATE_EXIT:
                 this->currState = new gsIntro();

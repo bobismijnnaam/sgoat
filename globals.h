@@ -11,5 +11,7 @@ extern  SDL_Surface* screen;
 extern cGameMan* gm;
 
 extern TTF_Font* fIntro;
+extern TTF_Font* fButton;
+extern TTF_Font* fSmall;
 
 #endif

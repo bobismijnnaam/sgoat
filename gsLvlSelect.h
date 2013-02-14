@@ -2,6 +2,7 @@
 #define GSLVLSELECT_H
 
 #include "gamestate.h"
+#include "buttons.h"
 
 class gsLvlSelect : public cGameState {
 public:
@@ -13,6 +14,10 @@ public:
     int render(SDL_Surface* dst);
 
 private:
+    cButtonSet* buttons;
+    cButtonSet* bBack;
+
+    GameStates targetState;
 
 } ;
 

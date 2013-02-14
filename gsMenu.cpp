@@ -5,11 +5,21 @@
 #include "gsMenu.h"
 
 gsMenu::gsMenu() {
-    bg = loadImage("Media/Graphics/bg2.png");
+    Uint32 nclr = SDL_MapRGB(screen->format, 255, 255, 255);
+    Uint32 hclr = SDL_MapRGB(screen->format, 0, 150, 0);
+    buttons = new cButtonSet(fButton, true, B_NULL, 100, 100, 10, 50, 500, 100, DIR_LEFT, nclr, hclr, screen->format);
+    buttons->addB("Play");
+    buttons->addB("Help");
+    buttons->addB("About");
+    buttons->addB("Exit");
+
+    targetState = STATE_NULL;
 }
 
 gsMenu::~gsMenu() {
     SDL_FreeSurface(bg);
+
+    delete buttons;
 }
 
 int gsMenu::events() {
@@ -27,18 +37,45 @@ int gsMenu::events() {
                 gm->setNextState(STATE_MENU);
             }
         }
+
+        buttons->handleEvents(&event);
     }
 
     return 0;
 }
 
 int gsMenu::logic() {
+    switch (buttons->gReleased()) {
+    case 1:
+        buttons->moveOut();
+        targetState = STATE_LVLSELECT;
+        break;
+    case 2:
+        buttons->moveOut();
+        targetState = STATE_HELP;
+        break;
+    case 3:
+        // Iets met about;
+        break;
+    case 4:
+        buttons->moveOut();
+        targetState = STATE_EXIT;
+        break;
+    }
+
+    buttons->logic();
+
+    if (buttons->gState() == B_AWAY && targetState != STATE_NULL) {
+        gm->setNextState(targetState);
+    }
 
     return 0;
 }
 
 int gsMenu::render(SDL_Surface* dst) {
-    applySurface(bg, dst, 0, 0);
+    fresh(dst, true);
+
+    buttons->render(dst);
 
     return 0;
 }

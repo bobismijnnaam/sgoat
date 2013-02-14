@@ -4,6 +4,7 @@
 #include <SDL/SDL.h>
 
 #include "gamestate.h"
+#include "buttons.h"
 
 class gsMenu : public cGameState {
 public:
@@ -16,6 +17,10 @@ public:
 
 private:
     SDL_Surface* bg;
+
+    cButtonSet* buttons;
+
+    GameStates targetState;
 
 } ;
 
