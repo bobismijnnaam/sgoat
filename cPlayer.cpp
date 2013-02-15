@@ -3,6 +3,7 @@
 #include <sstream>
 
 #include "cPlayer.h"
+#include "cLevel.h"
 #include "constants.h"
 #include "functions.h"
 #include "globals.h"
@@ -16,6 +17,7 @@ cPlayer::cPlayer() {
     y = 0;
     xvel = 0;
     yvel = 0;
+    speed = 140;
 
     lastMoveTime = SDL_GetTicks();
 }
@@ -29,16 +31,16 @@ int cPlayer::events(SDL_Event* event) {
     if (event->type == SDL_KEYDOWN) {
         switch (event->key.keysym.sym) {
             case SDLK_w:
-                yvel = -10;
+                yvel = -1 * speed;
                 break;
             case SDLK_a:
-                xvel = -10;
+                xvel = -1 * speed;
                 break;
             case SDLK_s:
-                yvel = 10;
+                yvel = speed;
                 break;
             case SDLK_d:
-                xvel = 10;
+                xvel = speed;
                 break;
         }
     } else if (event->type == SDL_KEYUP) {
@@ -61,14 +63,38 @@ int cPlayer::events(SDL_Event* event) {
     return 0;
 }
 
-int cPlayer::logic() {
+int cPlayer::logic(cLevel* level) {
     int thisMoveTime = SDL_GetTicks();
     float dt = (thisMoveTime - lastMoveTime) / 1000.0;
 
-    x += xvel * dt;
-    y += yvel * dt;
+    SDL_Rect playerRect;
+    coord newPos, oldPos;
 
-    // Collision moet hier nog!
+    oldPos.x = x;
+    oldPos.y = y;
+    oldPos.hit = false;
+
+    // Movement. r2inv = 1/root(2) to account for diagonal movement
+    if (xvel != 0 && yvel != 0) {
+        x += xvel * dt * r2inv;
+        y += yvel * dt * r2inv;
+    } else {
+        x += xvel * dt;
+        y += yvel * dt;
+    }
+
+    playerRect.x = x - playerImg->w / 2;
+    playerRect.y = y - playerImg->h / 2;
+    playerRect.w = playerImg->w;
+    playerRect.h = playerImg->h;
+
+    // Collision
+    newPos = level->slideCol(&playerRect, &oldPos);
+    if (newPos.hit) {
+        x = newPos.x;
+        y = newPos.y;
+// TODO (Bob#1#): Collision
+    } // Give rectangle of player and previous x/y coordinates of rectangle. Return new rectangle, calculate middle x/y from that rectangle
 
     lastMoveTime = thisMoveTime;
 
@@ -119,5 +145,15 @@ int cPlayer::viewViewport(bool p) {
     viewport = p;
 
     return 0;
+}
+
+SDL_Rect cPlayer::getViewport() {
+    SDL_Rect t;
+    t.x = x - 350;
+    t.y = y - 350;
+    t.w = 700;
+    t.h = 700;
+
+    return t;
 }
 

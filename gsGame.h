@@ -2,6 +2,7 @@
 #define GSGAME_H
 
 #include "gamestate.h"
+#include "cLevel.h"
 #include "cPlayer.h"
 
 class gsGame : public cGameState {
@@ -16,7 +17,10 @@ public:
 private:
     int lvl;
 
+    int mx, my;
+
     cPlayer* player;
+    cLevel* level;
 
 } ;
 

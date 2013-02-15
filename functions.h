@@ -8,6 +8,7 @@
 // Dit zijn allemaal functies die ik (9 van de 10 keer) voorafgaand aan het project een keer gemaakt heb.
 // Ik zal hier kort beschrijven waar ik ze voor gebruik
 
+bool rectCol(SDL_Rect f, SDL_Rect s);
 SDL_Surface* createSurf(int w, int h, SDL_Surface* dst);
 int fresh(SDL_Surface* dst, bool black); // Dit maakt het scherm/surface helemaal wit (dit is niet moeilijk maar het scheelt typwerk 8D)
 bool inRangeEx (int p, int min, int max); // Deze functie checked of een variabele binnen een bepaald bereik is
