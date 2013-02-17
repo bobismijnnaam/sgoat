@@ -13,13 +13,15 @@ cPlayer::cPlayer() {
 
     viewport = false;
 
-    x = 0;
-    y = 0;
+    x = -275;
+    y = -100;
     xvel = 0;
     yvel = 0;
     speed = 140;
 
     lastMoveTime = SDL_GetTicks();
+
+    col = false;
 }
 
 cPlayer::~cPlayer() {
@@ -67,12 +69,8 @@ int cPlayer::logic(cLevel* level) {
     int thisMoveTime = SDL_GetTicks();
     float dt = (thisMoveTime - lastMoveTime) / 1000.0;
 
-    SDL_Rect playerRect;
-    coord newPos, oldPos;
-
-    oldPos.x = x;
-    oldPos.y = y;
-    oldPos.hit = false;
+    BOB_Rect playerRect;
+    coord centroid;
 
     // Movement. r2inv = 1/root(2) to account for diagonal movement
     if (xvel != 0 && yvel != 0) {
@@ -88,13 +86,14 @@ int cPlayer::logic(cLevel* level) {
     playerRect.w = playerImg->w;
     playerRect.h = playerImg->h;
 
+    centroid.x = x;
+    centroid.y = y;
+
     // Collision
-    newPos = level->slideCol(&playerRect, &oldPos);
-    if (newPos.hit) {
-        x = newPos.x;
-        y = newPos.y;
-// TODO (Bob#1#): Collision
-    } // Give rectangle of player and previous x/y coordinates of rectangle. Return new rectangle, calculate middle x/y from that rectangle
+    if (level->slideCol(&playerRect, &centroid)) {
+        x = centroid.x;
+        y = centroid.y;
+    }
 
     lastMoveTime = thisMoveTime;
 
@@ -137,6 +136,8 @@ int cPlayer::render(SDL_Surface* dst) {
         SDL_FreeSurface(tS);
 
     }
+
+    if (col) applySurface(playerImg, dst, 0, 0);
 
     return 0;
 }

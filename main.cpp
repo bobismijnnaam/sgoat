@@ -1,3 +1,5 @@
+// OPERATION GET OUT, OP GO
+
 #include "mtwist.h"
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
@@ -18,7 +20,7 @@ int init() {
 
     screen = SDL_SetVideoMode(SCR_W, SCR_H, SCR_BPP, SDL_SWSURFACE);
 
-    SDL_WM_SetCaption("Scapegoat | Knights of the Compiler", NULL);
+    SDL_WM_SetCaption("Operation Get Out | Knights of the Compiler", NULL);
 
     gm = new cGameMan(STATE_INTRO);
 

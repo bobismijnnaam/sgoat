@@ -4,8 +4,49 @@
 #include <string>
 #include <sstream>
 
+#include "cLevel.h"
 #include "functions.h"
 #include "globals.h"
+
+bool BOBrectCol(BOB_Rect f, SDL_Rect s) {
+    bool ret = false;
+
+    float t1, r1, b1, l1;
+    float t2, r2, b2, l2;
+
+    t1 = f.y;
+    r1 = f.x + f.w;
+    b1 = f.y + f.h;
+    l1 = f.x;
+
+    t2 = s.y;
+    r2 = s.x + s.w;
+    b2 = s.y + s.h;
+    l2 = s.x;
+
+    // Er zijn vier situaties mogelijk: - rechtsonder1 overlapt linksboven2
+    //                                  - linksonder1 overlapt rechtsboven2
+    //                                  - linksboven1 overlapt rechtsonder2
+    //                                  - rechtsboven1 overlapt linksonder2
+    // Die worden hier elk individueel gechecked
+
+    if (r1 > l2 && r1 < r2) { // rechts
+        if (b1 > t2 && b1 < b2) { // onder1 overlapt linksboven2
+            ret = true;
+        } else if (t1 > t2 && t1 < b2) { // boven overlapt overlapt linksonder2
+            ret = true;
+        }
+    } else if (l1 > l2 && l1 < r2) { // links
+        if (b1 > t2 && b1 <= b2) { // onder1 overlapt rechtsboven2
+            ret = true;
+        } else if (t1 > t2 && t1 < b2) { // boven1 overlapt met rechtsonder2
+            ret = true;
+        }
+    }
+
+    return ret;
+}
+
 
 bool rectCol(SDL_Rect f, SDL_Rect s) {
     bool ret = false;
@@ -29,16 +70,16 @@ bool rectCol(SDL_Rect f, SDL_Rect s) {
     //                                  - rechtsboven1 overlapt linksonder2
     // Die worden hier elk individueel gechecked
 
-    if (r1 >= l2 && r1 <= r2) { // rechts
-        if (b1 >= t2 && b1 <= b2) { // onder1 overlapt linksboven2
+    if (r1 > l2 && r1 < r2) { // rechts
+        if (b1 > t2 && b1 < b2) { // onder1 overlapt linksboven2
             ret = true;
-        } else if (t1 >= t2 && t1 <= b2) { // boven overlapt overlapt linksonder2
+        } else if (t1 > t2 && t1 < b2) { // boven overlapt overlapt linksonder2
             ret = true;
         }
-    } else if (l1 >= l2 && l1 <= r2) { // links
-        if (b1 >= t2 && b1 <= b2) { // onder1 overlapt rechtsboven2
+    } else if (l1 > l2 && l1 < r2) { // links
+        if (b1 > t2 && b1 <= b2) { // onder1 overlapt rechtsboven2
             ret = true;
-        } else if (t1 >= t2 && t1 <= b2) { // boven1 overlapt met rechtsonder2
+        } else if (t1 > t2 && t1 < b2) { // boven1 overlapt met rechtsonder2
             ret = true;
         }
     }

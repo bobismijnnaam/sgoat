@@ -6,7 +6,7 @@
 
 gsGame::gsGame(int flvl) {
     player = new cPlayer();
-    level = new cLevel(screen);
+    level = new cLevel(screen, -500, 500, 500, -500);
 
     player->viewViewport(true);
     level->addWall(-300, 50, -200, -50); // Bovenste

@@ -25,6 +25,7 @@ private:
     int lastMoveTime;
 
     bool viewport;
+    bool col;
 } ;
 
 #endif
