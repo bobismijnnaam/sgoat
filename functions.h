@@ -7,9 +7,10 @@
 
 #include "cLevel.h"
 
-// Dit zijn allemaal functies die ik (9 van de 10 keer) voorafgaand aan het project een keer gemaakt heb.
-// Ik zal hier kort beschrijven waar ik ze voor gebruik
-
+int cross(SDL_Surface* dst, int x, int y, int size, int r, int g, int b, int a);
+int Bmin(int f, int s);
+int Bmax(int f, int s);
+bool lineline(int L1X1, int L1Y1, int L1X2, int L1Y2, int L2X1, int L2Y1, int L2X2, int L2Y2, int* X, int* Y);
 bool BOBrectCol(BOB_Rect f, SDL_Rect s);
 bool rectCol(SDL_Rect f, SDL_Rect s);
 SDL_Surface* createSurf(int w, int h, SDL_Surface* dst);

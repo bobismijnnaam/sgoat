@@ -1,3 +1,4 @@
+#include "SDL_gfxPrimitives.h"
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
 #include <SDL/SDL_image.h>
@@ -7,6 +8,54 @@
 #include "cLevel.h"
 #include "functions.h"
 #include "globals.h"
+
+int cross(SDL_Surface* dst, int x, int y, int size, int r, int g, int b, int a) {
+    lineRGBA(dst, x - size, y - size, x + size, y + size, r, g, b, a);
+    lineRGBA(dst, x - size, y + size, x + size, y - size, r, g, b, a);
+
+    return 0;
+}
+
+int Bmin(int f, int s) {
+    if (f < s) {
+        return f;
+    } else {
+        return s;
+    }
+}
+
+int Bmax(int f, int s) {
+    if (f > s) {
+        return f;
+    } else {
+        return s;
+    }
+}
+
+// http://en.wikipedia.org/wiki/Line-line_intersection
+bool lineline(int L1X1, int L1Y1, int L1X2, int L1Y2, int L2X1, int L2Y1, int L2X2, int L2Y2, int* X, int* Y) {
+    int D = (L1X1 - L1X2) * (L2Y1 - L2Y2) - (L1Y1 - L1Y2) * (L2X1 - L2X2); // Denominator. If zero then no intersection
+
+    if (D == 0) { // Parallel and possibly overlapping
+        return false;
+    } else {
+        *X = ( (L1X1 * L1Y2 - L1Y1 * L1X2) * (L2X1 - L2X2) - (L1X1 - L1X2) * (L2X1 * L2Y2 - L2Y1 * L2X2) ) / D; // Calculate x
+        *Y = ( (L1X1 * L1Y2 - L1Y1 * L1X2) * (L2Y1 - L2Y2) - (L1Y1 - L1Y2) * (L2X1 * L2Y2 - L2Y1 * L2X2) ) / D; // Calculate y
+
+        if (*X >= Bmin(L1X1, L1X2) && *X <= Bmax(L1X1, L1X2) && *Y >= Bmin(L1Y1, L1Y2) && *Y <= Bmax(L1Y1, L1Y2)) {
+            // Intersection is on first line
+            if (*X >= Bmin(L2X1, L2X2) && *X <= Bmax(L2X1, L2X2) && *Y >= Bmin(L2Y1, L2Y2) && *Y <= Bmax(L2Y1, L2Y2)) {
+                // Intersection is on second line
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+        return true;
+    }
+}
 
 bool BOBrectCol(BOB_Rect f, SDL_Rect s) {
     bool ret = false;
