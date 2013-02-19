@@ -15,6 +15,9 @@ public:
     int viewViewport(bool p);
     SDL_Rect getViewport();
 
+    float gX();
+    float gY();
+
 private:
     SDL_Surface* playerImg;
 

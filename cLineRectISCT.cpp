@@ -17,7 +17,7 @@ int cLineRectISCT::setRect(SDL_Rect* srcRect) {
     return 0;
 }
 
-int cLineRectISCT::setLine(int X1, int Y1, int X2, int Y2) {
+int cLineRectISCT::setLine(int X1, int Y1, int X2, int Y2) { // Set the line coordinates
     lx1 = X1;
     ly1 = Y1;
     lx2 = X2;
@@ -26,7 +26,7 @@ int cLineRectISCT::setLine(int X1, int Y1, int X2, int Y2) {
     return 0;
 }
 
-int cLineRectISCT::set(SDL_Rect* srcRect, int X1, int Y1, int X2, int Y2) {
+int cLineRectISCT::set(SDL_Rect* srcRect, int X1, int Y1, int X2, int Y2) { // Set the rectangle
     rect = *srcRect;
 
     lx1 = X1;
@@ -37,8 +37,9 @@ int cLineRectISCT::set(SDL_Rect* srcRect, int X1, int Y1, int X2, int Y2) {
     return 0;
 }
 
-bool cLineRectISCT::calc() { // Calculate the two intersection points
-    int sides[4][4]; // [Top Right Bottom Left] [X1 Y1 X2 Y2]
+bool cLineRectISCT::calc() { // Calculate the two intersection points. Returns true on collision
+    // Initialize variables
+    int sides[4][4];
     int hits[2][2];
     int tx, ty;
     ctr = 0;
@@ -64,6 +65,9 @@ bool cLineRectISCT::calc() { // Calculate the two intersection points
     sides[lineLeft][coordX2] = rect.x;
     sides[lineLeft][coordY2] = rect.y + rect.h;
 
+    // Loop through all the edges of the rectangle en check for collision with the line.
+    // This reduces the problem to line/line collision, which is easy and cheap for the CPU
+    // If there is a collision, save it
     for (int i = 0; i < 4; ++i) {
         if (lineline(sides[i][coordX1], sides[i][coordY1], sides[i][coordX2], sides[i][coordY2], lx1, ly1, lx2, ly2, &tx, &ty)) {
             if (ctr == 0) {
@@ -87,7 +91,7 @@ bool cLineRectISCT::calc() { // Calculate the two intersection points
     }
 }
 
-int cLineRectISCT::get(int* X1, int* Y1, int* X2, int* Y2) {
+int cLineRectISCT::get(int* X1, int* Y1, int* X2, int* Y2) { // Return the coordinates of the collision
     *X1 = x1;
     *Y1 = y1;
     *X2 = x2;

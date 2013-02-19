@@ -9,14 +9,14 @@
 #include "functions.h"
 #include "globals.h"
 
-int cross(SDL_Surface* dst, int x, int y, int size, int r, int g, int b, int a) {
+int cross(SDL_Surface* dst, int x, int y, int size, int r, int g, int b, int a) { // Draws a cross
     lineRGBA(dst, x - size, y - size, x + size, y + size, r, g, b, a);
     lineRGBA(dst, x - size, y + size, x + size, y - size, r, g, b, a);
 
     return 0;
 }
 
-int Bmin(int f, int s) {
+int Bmin(int f, int s) { // Returns lowest
     if (f < s) {
         return f;
     } else {
@@ -24,7 +24,7 @@ int Bmin(int f, int s) {
     }
 }
 
-int Bmax(int f, int s) {
+int Bmax(int f, int s) { // Returns highest
     if (f > s) {
         return f;
     } else {
@@ -33,7 +33,7 @@ int Bmax(int f, int s) {
 }
 
 // http://en.wikipedia.org/wiki/Line-line_intersection
-bool lineline(int L1X1, int L1Y1, int L1X2, int L1Y2, int L2X1, int L2Y1, int L2X2, int L2Y2, int* X, int* Y) {
+bool lineline(int L1X1, int L1Y1, int L1X2, int L1Y2, int L2X1, int L2Y1, int L2X2, int L2Y2, int* X, int* Y) { // Returns the point of intersection of two lines
     int D = (L1X1 - L1X2) * (L2Y1 - L2Y2) - (L1Y1 - L1Y2) * (L2X1 - L2X2); // Denominator. If zero then no intersection
 
     if (D == 0) { // Parallel and possibly overlapping
@@ -48,11 +48,14 @@ bool lineline(int L1X1, int L1Y1, int L1X2, int L1Y2, int L2X1, int L2Y1, int L2
                 // Intersection is on second line
                 return true;
             } else {
+                // Intersection is on first, but not on second line
                 return false;
             }
         } else {
+            // Intersection is not on first line.
             return false;
         }
+
         return true;
     }
 }
@@ -78,6 +81,7 @@ bool BOBrectCol(BOB_Rect f, SDL_Rect s) {
     //                                  - linksboven1 overlapt rechtsonder2
     //                                  - rechtsboven1 overlapt linksonder2
     // Die worden hier elk individueel gechecked
+    // Als een van de 4 een botsing oplevert geeft de functie sowieso waar.
 
     if (r1 > l2 && r1 < r2) { // rechts
         if (b1 > t2 && b1 < b2) { // onder1 overlapt linksboven2

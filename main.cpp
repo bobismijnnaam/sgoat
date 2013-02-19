@@ -24,6 +24,10 @@ int init() {
 
     gm = new cGameMan(STATE_INTRO);
 
+    // console hack
+    // freopen( "CON", "wt", stdout );
+    // freopen( "CON", "wt", stderr );
+
     return 0;
 }
 

@@ -4,6 +4,7 @@
 #include <SDL/SDL.h>
 #include <vector>
 
+#include "cLineRectISCT.h"
 #include "cPlayer.h"
 
 enum enumDir {
@@ -31,18 +32,20 @@ public:
     cLevel(SDL_Surface* dst, int t, int r, int b, int l);
     ~cLevel();
 
-    bool raycast(int x1, int y1, int x2, int y2);
-    coord getRayHit();
-
     int addWall(int t, int r, int b, int l);
+    int dispWall(SDL_Surface* dst, SDL_Rect* w, SDL_Rect* vp); // DIsplay a rectangle based on a viewport rectangle
+
     bool slideCol(BOB_Rect* pos, coord* centroid);
     enumDir displace(BOB_Rect* pos, SDL_Rect wall);
+    bool raycast(int x1, int y1, int x2, int y2, bool checkBorders);
+    coord getRayHit();
+
+    coord toScreen(coord p);
+    coord toWorld(coord p);
 
     int events(SDL_Event* event);
     int logic(cPlayer* player);
     int render(SDL_Surface* dst);
-
-    int dispWall(SDL_Surface* dst, SDL_Rect* w, SDL_Rect* vp); // DIsplay a rectangle based on a viewport rectangle
 
 private:
     std::vector<SDL_Rect> walls;
@@ -54,6 +57,8 @@ private:
     Uint32 wallclr;
 
     enumDir dir;
+
+    cLineRectISCT lineRect;
 
     bool dirOn;
 } ;

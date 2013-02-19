@@ -13,8 +13,8 @@ cPlayer::cPlayer() {
 
     viewport = false;
 
-    x = -275;
-    y = -100;
+    x = 0;
+    y = 0;
     xvel = 0;
     yvel = 0;
     speed = 140;
@@ -156,5 +156,13 @@ SDL_Rect cPlayer::getViewport() {
     t.h = 700;
 
     return t;
+}
+
+float cPlayer::gX() {
+    return x;
+}
+
+float cPlayer::gY() {
+    return y;
 }
 

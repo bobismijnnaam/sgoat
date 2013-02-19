@@ -1,3 +1,4 @@
+#include <iostream>
 #include <SDL/SDL.h>
 #include "SDL_gfxPrimitives.h"
 
@@ -35,9 +36,84 @@ cLevel::~cLevel() {
     // Niets te deleten
 }
 
-bool cLevel::raycast(int x1, int y1, int x2, int y2) { // Komt nog
+bool cLevel::raycast(int x1, int y1, int x2, int y2, bool checkBorders) { // Returns collision closest to (x1, y1)!
+    std::vector<coord> points;
+    int t1x, t1y, t2x, t2y, N;
+    coord tc;
+    bool ret = false;
 
-    return false;
+    // Iterate through all the walls. Check for collision. If there is, add the collision points to the list.
+    for (int i = 0; i < walls.size(); ++i) {
+        lineRect.set(&walls[i], x1, y1, x2, y2);
+        if (lineRect.calc()) {
+            ret = true;
+            N = lineRect.get(&t1x, &t1y, &t2x, &t2y);
+            tc.x = t1x;
+            tc.y = t1y;
+            points.push_back(tc);
+
+            if (N == 2) {
+                tc.x = t2x;
+                tc.y = t2y;
+                points.push_back(tc);
+            }
+        }
+    }
+
+    // std::cout << points.size() << " | "; // Debugging leftovers
+
+    // Iterate through borders if checkBorders = true
+    // If again there are collisions, add the collision points to the list.
+    if (checkBorders) {
+        for (int i = 0; i < 4; ++i) {
+            lineRect.set(&borders[i], x1, y1, x2, y2);
+            if (lineRect.calc()) {
+                ret = true;
+                N = lineRect.get(&t1x, &t1y, &t2x, &t2y);
+                tc = {t1x, t1y};
+                points.push_back(tc);
+
+                if (N == 2) {
+                    tc = {t2x, t2y};
+                    points.push_back(tc);
+                }
+            }
+        }
+    }
+
+    // std::cout << points.size() << "\n"; // More leftovers
+
+    // Find the point closest to (x1, x2) and mark it as the first collision point.
+    // This point can later be retrieved with getRayHit()
+    int closest, cDist;
+    int dx, dy, dist2;
+
+    if (points.size() > 0) {
+        dx = x1 - points[0].x;
+        dy = y1 - points[0].y;
+        dist2 = dx * dx + dy * dy;
+
+        closest = 0;
+        cDist = dist2;
+
+        for (int i = 1; i < points.size(); ++i) {
+            dx = x1 - points[i].x;
+            dy = y1 - points[i].y;
+            dist2 = dx * dx + dy * dy;
+
+            if (dist2 < cDist) {
+                closest = i;
+                cDist = dist2;
+            }
+        }
+
+        rayHit.x = points[closest].x;
+        rayHit.y = points[closest].y;
+
+        return true;
+    } else {
+        return false;
+    }
 }
 
 coord cLevel::getRayHit() {
@@ -51,9 +127,6 @@ int cLevel::addWall(int t, int r, int b, int l) {
     dummy.w = r - l;
     dummy.h = b - t;
     walls.push_back(dummy);
-
-    // Sides converted to lines
-
 
     return 0;
 }
@@ -90,6 +163,9 @@ bool cLevel::slideCol(BOB_Rect* pos, coord* centroid) {
 }
 
 enumDir cLevel::displace(BOB_Rect* pos, SDL_Rect wall) {
+    // Deze functie duwt het vierkant buiten het andere vierkant
+    // En geeft de kant dat ie 'm opduwt
+
     enumDir direction;
 
     // Ten opzichte van wall. Dus dt = verschil onderrand speler en bovenrand wall
@@ -166,4 +242,20 @@ int cLevel::dispWall(SDL_Surface* dst, SDL_Rect* w, SDL_Rect* vp) {
     SDL_FillRect(dst, &dstRect, wallclr);
 
     return 0;
+}
+
+coord cLevel::toScreen(coord p) {
+    coord np;
+    np.x = p.x - vp.x;
+    np.y = p.y - vp.y;
+
+    return np;
+}
+
+coord cLevel::toWorld(coord p) {
+    coord np;
+    np.x = p.x + vp.x;
+    np.y = p.y + vp.y;
+
+    return np;
 }

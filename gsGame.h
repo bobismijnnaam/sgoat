@@ -25,6 +25,9 @@ private:
     int x1, y1, x2, y2;
     SDL_Rect* rect;
 
+    bool rayTest;
+    coord hit;
+
     cLineRectISCT intersector;
 
     cPlayer* player;
