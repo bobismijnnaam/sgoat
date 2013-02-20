@@ -5,6 +5,7 @@
 #include "cLevel.h"
 #include "cLineRectISCT.h"
 #include "cPlayer.h"
+#include "cAI.h"
 
 class gsGame : public cGameState {
 public:
@@ -28,10 +29,9 @@ private:
     bool rayTest;
     coord hit;
 
-    cLineRectISCT intersector;
-
     cPlayer* player;
     cLevel* level;
+    cAI* ai;
 
 } ;
 

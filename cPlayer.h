@@ -15,6 +15,8 @@ public:
     int viewViewport(bool p);
     SDL_Rect getViewport();
 
+    SDL_Rect playerRect();
+
     float gX();
     float gY();
 

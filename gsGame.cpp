@@ -1,6 +1,7 @@
 #include <SDL/SDL.h>
 #include "SDL_gfxPrimitives.h"
 
+#include "constants.h"
 #include "functions.h"
 #include "globals.h"
 #include "gsGame.h"
@@ -9,19 +10,24 @@ gsGame::gsGame(int flvl) {
     // Initialize game objects
     player = new cPlayer();
     level = new cLevel(screen, -500, 500, 500, -500);
+    ai = new cAI();
 
     // Initialize level
     player->viewViewport(true);
+
     level->addWall(-300, 50, -200, -50); // Bovenste
     level->addWall(-50, 300, 50, 200); // Rechter
     level->addWall(200, 50, 300, -50);
     level->addWall(-50, -200, 50, -300);
+
+    ai->addPointGuard(250, -250, 2 * pi / 5);
 
     // Initialize mouse variables
     mx = 0;
     my = 0;
 
     // Initialize ray test variables
+    hit.hit = false;
     hit.hit = false;
     rayTest = true;
 }
@@ -30,6 +36,7 @@ gsGame::~gsGame() {
     // Clean up
     delete player;
     delete level;
+    delete ai;
 }
 
 int gsGame::events() {
@@ -52,6 +59,7 @@ int gsGame::events() {
         // Update events for game objects
         player->events(&event);
         level->events(&event);
+        ai->events(&event);
     }
     return 0;
 }
@@ -76,6 +84,8 @@ int gsGame::logic() {
         }
     }
 
+    ai->logic(player, level);
+
     return 0;
 }
 
@@ -86,6 +96,7 @@ int gsGame::render(SDL_Surface* dst) {
     // Render game objects
     level->render(dst);
     player->render(dst);
+    ai->render(dst, level);
 
     // Display raycasting test hitpoint
     if (hit.hit && rayTest) {

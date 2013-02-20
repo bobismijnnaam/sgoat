@@ -7,9 +7,12 @@
 
 #include "cLevel.h"
 
-int cross(SDL_Surface* dst, int x, int y, int size, int r, int g, int b, int a);
 int Bmin(int f, int s);
 int Bmax(int f, int s);
+float Bmin(float f, float s);
+float Bmax(float f, float s);
+
+int cross(SDL_Surface* dst, int x, int y, int size, int r, int g, int b, int a);
 bool lineline(int L1X1, int L1Y1, int L1X2, int L1Y2, int L2X1, int L2Y1, int L2X2, int L2Y2, int* X, int* Y);
 bool BOBrectCol(BOB_Rect f, SDL_Rect s);
 bool rectCol(SDL_Rect f, SDL_Rect s);

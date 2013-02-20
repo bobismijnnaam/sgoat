@@ -9,6 +9,22 @@
 #include "functions.h"
 #include "globals.h"
 
+float Bmin(float f, float s) {
+    if (f < s) {
+        return f;
+    } else {
+        return s;
+    }
+}
+
+float Bmax(float f, float s) {
+    if (f > s) {
+        return f;
+    } else {
+        return s;
+    }
+}
+
 int cross(SDL_Surface* dst, int x, int y, int size, int r, int g, int b, int a) { // Draws a cross
     lineRGBA(dst, x - size, y - size, x + size, y + size, r, g, b, a);
     lineRGBA(dst, x - size, y + size, x + size, y - size, r, g, b, a);

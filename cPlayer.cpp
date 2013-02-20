@@ -1,6 +1,7 @@
 #include <SDL/SDL.h>
 #include <string>
 #include <sstream>
+#include "SDL_gfxPrimitives.h"
 
 #include "cPlayer.h"
 #include "cLevel.h"
@@ -100,7 +101,7 @@ int cPlayer::logic(cLevel* level) {
     return 0;
 }
 
-int cPlayer::render(SDL_Surface* dst) {
+int cPlayer::render(SDL_Surface* dst) { // Player is rendered with
     applySurface(playerImg, dst, (SCR_W - playerImg->w) / 2, (SCR_H - playerImg->h) / 2);
 
     if (viewport) {
@@ -139,6 +140,8 @@ int cPlayer::render(SDL_Surface* dst) {
 
     if (col) applySurface(playerImg, dst, 0, 0);
 
+    pixelRGBA(dst, 350, 350, 255, 0, 0, 255);
+
     return 0;
 }
 
@@ -154,6 +157,16 @@ SDL_Rect cPlayer::getViewport() {
     t.y = y - 350;
     t.w = 700;
     t.h = 700;
+
+    return t;
+}
+
+SDL_Rect cPlayer::playerRect() {
+    SDL_Rect t;
+    t.x = x - playerImg->w / 2;
+    t.y = y - playerImg->h / 2;
+    t.w = playerImg->w;
+    t.h = playerImg->h;
 
     return t;
 }
