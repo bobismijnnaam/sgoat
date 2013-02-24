@@ -1,3 +1,4 @@
+#include <cmath>
 #include "SDL_gfxPrimitives.h"
 #include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
@@ -6,8 +7,120 @@
 #include <sstream>
 
 #include "cLevel.h"
+#include "constants.h"
 #include "functions.h"
 #include "globals.h"
+
+// http://math.stackexchange.com/questions/110080/shortest-way-to-achieve-target-angle
+float toAng(float s, float e, float t) { // Moves to shortest angle
+    bool clockwise;
+    float d, diff;
+    float a, b, c;
+    a = e - s;
+    b = e - s + 2 * pi;
+    c = e - s - 2 * pi;
+
+    float fa, fb, fc;
+    fa = fabs(a);
+    fb = fabs(b);
+    fc = fabs(c);
+
+    if (fa <= fb && fa <= fc) {
+        d = a;
+    } else if (fb <= fa && fb <= fc) {
+        d = b;
+    } else {
+        d = c;
+    }
+
+    if (d > 0) {
+        clockwise = true;
+    } else {
+        clockwise = false;
+    }
+
+    if (!clockwise) {
+        if (e < s) { // Counter clockwise
+            diff = s - e;
+        } else {
+            diff = s + (2 * pi - e);
+        }
+
+        return s - diff * t;
+    } else {
+        if (s < e) { // Clockwise
+            diff = e - s;
+            return s + diff * t;
+        } else {
+            diff = e + (2 * pi - s);
+            return s + diff * t;
+        }
+    }
+}
+
+float lerpAng(float f, float s, float t, bool clockwise) { // t = [0, 1]
+    float F = f;
+    float S = s;
+    float ang, diff;
+
+    // To keep the angle in domain [0, 2pi] because of atan2
+    while (F < 0) {
+        F += 2 * pi;
+    }
+    while (F > 2 * pi) {
+        F -= 2 * pi;
+    }
+    while (S < 0) {
+        S += 2 * pi;
+    }
+    while (S > 2 * pi) {
+        S -= 2 * pi;
+    }
+
+    F = Bmin(F, S);
+    S = Bmax(F, S);
+
+    if (clockwise) {
+        diff = F + (2 * pi - S);
+        ang = F -  diff * t;
+    } else {
+        diff = S - F;
+        ang = F + diff * t;
+    }
+
+    return ang;
+}
+
+float diffAng(float f, float s) {
+    float F = f;
+    float S = s;
+
+    // To keep the angle in domain [0, 2pi] because of atan2
+    while (F < 0) {
+        F += 2 * pi;
+    }
+    while (F > 2 * pi) {
+        F -= 2 * pi;
+    }
+    while (S < 0) {
+        S += 2 * pi;
+    }
+    while (S > 2 * pi) {
+        S -= 2 * pi;
+    }
+
+    float diffCClock = fabs(F - S); // Verschil tegen de klok in.
+    float diffClock = Bmin(F, S) + (2.0 * pi - Bmax(F, S)); // Verschil met de klok mee
+
+    // Degrees away from looking angle
+    float dAng = Bmin(diffCClock, diffClock);
+
+    return dAng;
+}
+
+float tweenInOut(float t) { // give value between 0 and 1. Will smooth it, go slow in the beginning, fast in the middle and slow in the end
+    return 6 * t * t * t * t * t - 15 * t * t * t * t + 10 * t * t * t;
+}
 
 float Bmin(float f, float s) {
     if (f < s) {
@@ -92,6 +205,8 @@ bool BOBrectCol(BOB_Rect f, SDL_Rect s) {
     b2 = s.y + s.h;
     l2 = s.x;
 
+    // 2 = SDL, 1 = BOB
+
     // Er zijn vier situaties mogelijk: - rechtsonder1 overlapt linksboven2
     //                                  - linksonder1 overlapt rechtsboven2
     //                                  - linksboven1 overlapt rechtsonder2
@@ -109,6 +224,31 @@ bool BOBrectCol(BOB_Rect f, SDL_Rect s) {
         if (b1 > t2 && b1 <= b2) { // onder1 overlapt rechtsboven2
             ret = true;
         } else if (t1 > t2 && t1 < b2) { // boven1 overlapt met rechtsonder2
+            ret = true;
+        }
+    }
+
+    // Als deze vier situaties niet van toepassing zijn kan het ook nog dat
+    // de SDL_Rect omvat wordt door de BOB_Rect. Zeg maar zo:
+    //      _____________
+    //      |         __|________________
+    //      |        |_______SDL_Rect____|
+    //      | BOB_Rect  |
+    //      |___________|
+    // In dat geval werkt de voorgenoemde detectie niet omdat de hoeken van BOB_rect
+    // Niet in SDL_Rect vallen. Er moeten dus ook nog vier gevallen gemaakt worden voor als
+    // De SDL_Rect alleen de randen snijdt van de BOB_Rect.
+
+    if (t2 > t1 && b2 < b1) {
+        if (l2 < r1 && r2 > r1) {
+            ret = true;
+        } else if (r2 > l1 && l2 < l1) {
+            ret = true;
+        }
+    } else if (l2 > l1 && r2 < r1) {
+        if (t2 < b1 && b2 > b1) {
+            ret = true;
+        } else if (t2 < t1 && b2 > t1) {
             ret = true;
         }
     }

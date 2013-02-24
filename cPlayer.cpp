@@ -1,3 +1,4 @@
+#include <cmath>
 #include <SDL/SDL.h>
 #include <string>
 #include <sstream>
@@ -9,18 +10,23 @@
 #include "functions.h"
 #include "globals.h"
 
-cPlayer::cPlayer() {
+cPlayer::cPlayer(int Xs, int Ys, int Xe, int Ye) {
     playerImg = loadImage("Media/Graphics/player.png");
 
     viewport = false;
 
-    x = 0;
-    y = 0;
+    x = Xs;
+    y = Ys;
     xvel = 0;
     yvel = 0;
-    speed = 140;
+    speed = PLAYER_SPDNORMAL;
 
     lastMoveTime = SDL_GetTicks();
+
+    xs = Xs;
+    ys = Ys;
+    xe = Xe;
+    ye = Ye;
 
     col = false;
 }
@@ -34,16 +40,19 @@ int cPlayer::events(SDL_Event* event) {
     if (event->type == SDL_KEYDOWN) {
         switch (event->key.keysym.sym) {
             case SDLK_w:
-                yvel = -1 * speed;
+                yvel = -1;
                 break;
             case SDLK_a:
-                xvel = -1 * speed;
+                xvel = -1;
                 break;
             case SDLK_s:
-                yvel = speed;
+                yvel = 1;
                 break;
             case SDLK_d:
-                xvel = speed;
+                xvel = 1;
+                break;
+            case SDLK_LSHIFT:
+                speed = PLAYER_SPDSNEAK;
                 break;
         }
     } else if (event->type == SDL_KEYUP) {
@@ -60,6 +69,9 @@ int cPlayer::events(SDL_Event* event) {
             case SDLK_d:
                 if (xvel > 0) xvel = 0;
                 break;
+            case SDLK_LSHIFT:
+                speed = PLAYER_SPDNORMAL;
+                break;
         }
     }
 
@@ -75,11 +87,11 @@ int cPlayer::logic(cLevel* level) {
 
     // Movement. r2inv = 1/root(2) to account for diagonal movement
     if (xvel != 0 && yvel != 0) {
-        x += xvel * dt * r2inv;
-        y += yvel * dt * r2inv;
+        x += xvel * speed * dt * r2inv;
+        y += yvel * speed * dt * r2inv;
     } else {
-        x += xvel * dt;
-        y += yvel * dt;
+        x += xvel * speed * dt;
+        y += yvel * speed * dt;
     }
 
     playerRect.x = x - playerImg->w / 2;
@@ -98,11 +110,25 @@ int cPlayer::logic(cLevel* level) {
 
     lastMoveTime = thisMoveTime;
 
+    SDL_Rect t;
+    t.x = xe - 25;
+    t.y = ye - 25;
+    t.w = 50;
+    t.h = 50;
+
+    SDL_Rect p = this->playerRect();
+
+    if (rectCol(p, t)) {
+        return PLAYER_GOTOUT;
+    }
+
     return 0;
 }
 
 int cPlayer::render(SDL_Surface* dst) { // Player is rendered with
     applySurface(playerImg, dst, (SCR_W - playerImg->w) / 2, (SCR_H - playerImg->h) / 2);
+
+    if (col) applySurface(playerImg, dst, 0, 0);
 
     if (viewport) {
         SDL_Surface* tS;
@@ -135,12 +161,14 @@ int cPlayer::render(SDL_Surface* dst) { // Player is rendered with
         tS = TTF_RenderText_Blended(fSmall, ss.str().c_str(), clrWhite);
         applySurface(tS, dst, 350, SCR_H - tS->h);
         SDL_FreeSurface(tS);
+        ss.str(std::string());
+        ss.clear();
 
+        ss << "(" << (int)x << ", " << (int)y << ")";
+        tS = TTF_RenderText_Blended(fSmall, ss.str().c_str(), clrWhite);
+        applySurface(tS, dst, 350 - tS->w / 2, 350 - tS->h / 2 - 30);
+        SDL_FreeSurface(tS);
     }
-
-    if (col) applySurface(playerImg, dst, 0, 0);
-
-    pixelRGBA(dst, 350, 350, 255, 0, 0, 255);
 
     return 0;
 }
@@ -171,11 +199,47 @@ SDL_Rect cPlayer::playerRect() {
     return t;
 }
 
+coord cPlayer::gPlayerStart() {
+    coord t;
+    t.x = xs;
+    t.y = ys;
+
+    return t;
+}
+
+coord cPlayer::gPlayerEnd() {
+    coord t;
+    t.x = xe;
+    t.y = ye;
+
+    return t;
+}
+
 float cPlayer::gX() {
     return x;
 }
 
 float cPlayer::gY() {
     return y;
+}
+
+int cPlayer::gSpd() {
+    if (xvel == 0 && yvel == 0) {
+        return 0;
+    } else {
+        return speed;
+    }
+}
+
+int cPlayer::pause() {
+    xvel = 0;
+    yvel = 0;
+
+    return 0;
+}
+
+int cPlayer::resume() {
+
+    return 0;
 }
 

@@ -48,6 +48,7 @@ cGameMan::cGameMan(GameStates startState) {
     sScroll = createSurf(SCR_W * 2, SCR_H * 2, screen);
     tSurf = createSurf(SCR_W, SCR_H, screen);
     fresh(sScroll, true);
+    fresh(tSurf, true);
 }
 
 cGameMan::~cGameMan() {
@@ -99,6 +100,7 @@ int cGameMan::changeState() {
             this->stateID = this->nextState;
             this->nextState = STATE_NULL;
 
+            currState->logic();
             currState->render(tSurf);
             applySurface(tSurf, sScroll, SCR_W, 0);
             state = STATE_TRANSITION;

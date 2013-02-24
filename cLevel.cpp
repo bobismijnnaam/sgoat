@@ -5,7 +5,7 @@
 #include "cLevel.h"
 #include "functions.h"
 
-cLevel::cLevel(SDL_Surface* dst, int t, int r, int b, int l) {
+cLevel::cLevel(SDL_Surface* dst, int t, int r, int b, int l, cPlayer* player) {
     wallclr = SDL_MapRGB(dst->format, 0, 0, 0);
     rayHit.hit = false;
     dir = enumDirDOWN;
@@ -30,10 +30,16 @@ cLevel::cLevel(SDL_Surface* dst, int t, int r, int b, int l) {
     borders[3].y = b;
     borders[3].w = r - l;
     borders[3].h = 400;
+
+    playerPOI[0] = player->gPlayerStart();
+    playerPOI[1] = player->gPlayerEnd();
+    sEntrance = loadImage("Media/Graphics/entrance.png");
+    sExit = loadImage("Media/Graphics/exit.png");
 }
 
 cLevel::~cLevel() {
-    // Niets te deleten
+    SDL_FreeSurface(sEntrance);
+    SDL_FreeSurface(sExit);
 }
 
 bool cLevel::raycast(int x1, int y1, int x2, int y2, bool checkBorders) { // Returns collision closest to (x1, y1)!
@@ -227,6 +233,12 @@ int cLevel::render(SDL_Surface* dst) {
                 break;
         }
     }
+
+    coord tc;
+    tc = toScreen(playerPOI[0]);
+    applySurface(sEntrance, dst, tc.x - sEntrance->w/2, tc.y - sEntrance->h/2);
+    tc = toScreen(playerPOI[1]);
+    applySurface(sExit, dst, tc.x - sEntrance->w/2, tc.y - sEntrance->h/2);
 
     return 0;
 }

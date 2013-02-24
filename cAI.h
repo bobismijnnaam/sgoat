@@ -17,13 +17,16 @@ public:
     int render(SDL_Surface* dst, cLevel* level);
 
     int addWaypoint(int x, int y);
-    int addPatrolGuard(int movSpd, float rotSpd);
+    int addPatrolGuard(int x, int y, int movSpd, float rotTime, bool loop);
 
-    int addPointGuard(int x, int y, float rotSpd);
+    int addPointGuard(int x, int y, float StartAng, float EndAng, int rotTime, bool clockwise);
 
-    int addSleeper(int x, int y);
+    int addSleeper(int x, int y, int range);
 
     bool isSpotted();
+
+    int pause();
+    int resume();
 
 private:
     std::vector<cGuard*> guards;

@@ -17,6 +17,7 @@ int init() {
     fIntro = TTF_OpenFont("Media/Fonts/PressStart2P.ttf", 15);
     fButton = TTF_OpenFont("Media/Fonts/PressStart2P.ttf", 30);
     fSmall = TTF_OpenFont("Media/Fonts/PressStart2P.ttf", 10);
+    fBig = TTF_OpenFont("Media/Fonts/PressStart2P.ttf", 30);
 
     screen = SDL_SetVideoMode(SCR_W, SCR_H, SCR_BPP, SDL_SWSURFACE);
 
@@ -51,6 +52,7 @@ int quit() {
     TTF_CloseFont(fIntro);
     TTF_CloseFont(fButton);
     TTF_CloseFont(fSmall);
+    TTF_CloseFont(fBig);
 
     TTF_Quit();
 

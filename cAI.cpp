@@ -1,7 +1,9 @@
 
 
 #include "cAI.h"
+#include "cPatrolGuard.h"
 #include "cPointGuard.h"
+#include "cSleeperGuard.h"
 #include "functions.h"
 
 cAI::cAI() {
@@ -47,19 +49,20 @@ int cAI::addWaypoint(int x, int y) {
 
     return 0;
 }
+// int X, int Y, int RotTime, int Speed, std::vector<coord>& Waypoints, SDL_Surface* guardImg
+int cAI::addPatrolGuard(int x, int y, int movSpd, float rotTime, bool loop) {
+    guards.push_back(new cPatrolGuard(x, y, rotTime, movSpd, waypoints, sGuardPatrol, loop));
+    return 0;
+}
 
-int cAI::addPatrolGuard(int movSpd, float rotSpd) {
+int cAI::addPointGuard(int x, int y, float StartAng, float EndAng, int rotTime, bool clockwise) {
+    guards.push_back(new cPointGuard(x, y, StartAng, EndAng, rotTime, clockwise, sGuardPoint));
 
     return 0;
 }
 
-int cAI::addPointGuard(int x, int y, float rotSpd) {
-    guards.push_back(new cPointGuard(x, y, rotSpd, sGuardPoint));
-
-    return 0;
-}
-
-int cAI::addSleeper(int x, int y) {
+int cAI::addSleeper(int x, int y, int range) {
+    guards.push_back(new cSleeperGuard(x, y, range, sGuardSleeper));
 
     return 0;
 }
@@ -72,4 +75,20 @@ bool cAI::isSpotted() {
     }
 
     return false;
+}
+
+int cAI::pause() {
+    for (int i = 0; i < guards.size(); ++i) {
+        guards[i]->pause();
+    }
+
+    return 0;
+}
+
+int cAI::resume() {
+    for (int i = 0; i < guards.size(); ++i) {
+        guards[i]->resume();
+    }
+
+    return 0;
 }

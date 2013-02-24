@@ -3,9 +3,11 @@
 
 class cLevel;
 
+struct coord;
+
 class cPlayer {
 public:
-    cPlayer();
+    cPlayer(int xs, int ys, int xe, int ye);
     ~cPlayer();
 
     int events(SDL_Event* event);
@@ -16,9 +18,15 @@ public:
     SDL_Rect getViewport();
 
     SDL_Rect playerRect();
+    coord gPlayerStart();
+    coord gPlayerEnd();
+
+    int pause();
+    int resume();
 
     float gX();
     float gY();
+    int gSpd();
 
 private:
     SDL_Surface* playerImg;
@@ -26,6 +34,8 @@ private:
     float x, y;
     float xvel, yvel;
     float speed;
+
+    int xs, ys, xe, ye;
 
     int lastMoveTime;
 

@@ -1,11 +1,43 @@
 #include <SDL/SDL.h>
 #include <cmath>
 #include <iostream>
+#include "SDL_gfxPrimitives.h"
 
 #include "cGuard.h"
 #include "cLevel.h"
 #include "constants.h"
 #include "functions.h"
+
+int drawLOS(SDL_Surface* dst, cLevel* level, int x, int y, float Ang, float FOV, float Len) {
+    coord l[2];
+    coord tc = {x, y};
+    tc = level->toScreen(tc);
+
+    // Draw Line of Sight
+    /*
+    l.x = x + cos(Ang) * Len;
+    l.y = y + sin(Ang) * Len;
+    l = level->toScreen(l);
+    lineRGBA(dst, tc.x, tc.y, l.x, l.y, 255, 0, 0, 255);
+    */
+
+    // Edge line
+    l[0].x = x + cos(Ang + FOV * .5) * Len;
+    l[0].y = y + sin(Ang + FOV * .5) * Len;
+    l[0] = level->toScreen(l[0]);
+
+    // Other edge
+    l[1].x = x + cos(Ang - FOV * .5) * Len;
+    l[1].y = y + sin(Ang - FOV * .5) * Len;
+    l[1] = level->toScreen(l[1]);
+
+    filledTrigonRGBA(dst, tc.x, tc.y, l[1].x, l[1].y, l[0].x, l[0].y, 255, 0, 0, 80);
+    lineRGBA(dst, l[1].x, l[1].y, l[0].x, l[0].y, 255, 0, 0, 255);
+    lineRGBA(dst, tc.x, tc.y, l[0].x, l[0].y, 255, 0, 0, 255);
+    lineRGBA(dst, tc.x, tc.y, l[1].x, l[1].y, 255, 0, 0, 255);
+
+    return 0;
+}
 
 cGuard::cGuard() {
     // sGuard = loadImage("Media/Graphics/guard.png");
@@ -21,7 +53,7 @@ int cGuard::events() {
     return 0;
 }
 
-int cGuard::look(cPlayer* player, cLevel* level) {
+int cGuard::look(cPlayer* player, cLevel* level, bool watch) {
     // First check if the player touches the guard
     SDL_Rect t;
     t.x = x - sGuard->w / 2;
@@ -34,26 +66,19 @@ int cGuard::look(cPlayer* player, cLevel* level) {
         return 1;
     }
 
-    // Check if player is in FOV. If so, check if line of sight is without obstacles
-    int dx = player->gX() - x;
-    int dy = player->gY() - y;
-    float playerAngle = atan2((float)dy, (float)dx);
+    if (watch) {
+        // Check if player is in FOV. If so, check if line of sight is without obstacles
+        int dx = player->gX() - x;
+        int dy = player->gY() - y;
+        float playerAngle = atan2((float)dy, (float)dx);
 
-    // To keep the angle in domain [0, 2pi] because of atan2
-    if (playerAngle < 0) {
-        playerAngle += 2.0 * pi;
-    }
+        float dAng = diffAng(playerAngle, angle);
 
-    float diffCClock = fabs(playerAngle - angle); // Verschil tegen de klok in.
-    float diffClock = Bmin(playerAngle, angle) + (2.0 * pi - Bmax(playerAngle, angle)); // Verschil met de klok mee
-
-    // Degrees away from looking angle
-    float dAng = Bmin(diffCClock, diffClock);
-
-    if (dAng < GUARD_FOV / 2) {
-        spotted = !(level->raycast(x, y, player->gX(), player->gY(), false)); // Als er GEEN objecten tussenstaan geeft raycast FALSE, dus is de speler zichtbaar dus ziet de guard hem
-    } else {
-        spotted = false;
+        if (dAng < GUARD_FOV / 2) {
+            spotted = !(level->raycast(x, y, player->gX(), player->gY(), false)); // Als er GEEN objecten tussenstaan geeft raycast FALSE, dus is de speler zichtbaar dus ziet de guard hem
+        } else {
+            spotted = false;
+        }
     }
 
     return 0;
@@ -62,6 +87,19 @@ int cGuard::look(cPlayer* player, cLevel* level) {
 bool cGuard::isSpotted() {
     return spotted;
 }
+
+/*
+// To keep the angle in domain [0, 2pi] because of atan2
+if (playerAngle < 0) {
+    playerAngle += 2.0 * pi;
+}
+
+float diffCClock = fabs(playerAngle - angle); // Verschil tegen de klok in.
+float diffClock = Bmin(playerAngle, angle) + (2.0 * pi - Bmax(playerAngle, angle)); // Verschil met de klok mee
+
+// Degrees away from looking angle
+float dAng = Bmin(diffCClock, diffClock);
+*/
 
 /*
 

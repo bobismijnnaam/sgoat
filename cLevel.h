@@ -29,7 +29,7 @@ struct BOB_Rect {
 
 class cLevel {
 public:
-    cLevel(SDL_Surface* dst, int t, int r, int b, int l);
+    cLevel(SDL_Surface* dst, int t, int r, int b, int l, cPlayer* player);
     ~cLevel();
 
     int addWall(int t, int r, int b, int l);
@@ -50,6 +50,10 @@ public:
 private:
     std::vector<SDL_Rect> walls;
     SDL_Rect borders[4];
+
+    coord playerPOI[2];
+    SDL_Surface* sEntrance;
+    SDL_Surface* sExit;
 
     SDL_Rect vp;
     coord rayHit;

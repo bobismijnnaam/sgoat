@@ -13,5 +13,6 @@ extern cGameMan* gm;
 extern TTF_Font* fIntro;
 extern TTF_Font* fButton;
 extern TTF_Font* fSmall;
+extern TTF_Font* fBig;
 
 #endif

@@ -1,18 +1,26 @@
 #include <cmath>
+#include <iostream>
 #include "SDL_gfxPrimitives.h"
 
 #include "constants.h"
 #include "cPointGuard.h"
 #include "functions.h"
 
-cPointGuard::cPointGuard(int X, int Y, float RotSpd, SDL_Surface* Img) {
+cPointGuard::cPointGuard(int X, int Y, float StartAng, float EndAng, int RotTime, bool Clockwise, SDL_Surface* Img) {
     x = X;
     y = Y;
-    rotSpd = RotSpd;
+    rotTime = RotTime;
+    startAng = StartAng;
+    endAng = EndAng;
+    clockwise = Clockwise;
 
     sGuard = Img;
+    angle = startAng;
+    animTime = SDL_GetTicks();
+    state = PointGuardStates_FORTH;
 
     lastUpdate = SDL_GetTicks();
+    paused = false;
 }
 
 cPointGuard::~cPointGuard() {
@@ -21,19 +29,50 @@ cPointGuard::~cPointGuard() {
 
 int cPointGuard::logic(cPlayer* player, cLevel* level) {
     int thisUpdate = SDL_GetTicks();
-    float dt = (thisUpdate - lastUpdate) / 1000.0;
+    float diff;
+    float dtAng;
 
-    angle += rotSpd * dt;
+    if (paused) return 0;
 
-    if (angle > 2 * pi) {
-        angle -= 2 * pi;
+    // Change state after rottime has elapsed
+    if (thisUpdate - animTime > rotTime) {
+        if (state == PointGuardStates_BACK) {
+            state = PointGuardStates_FORTH;
+        } else if (state == PointGuardStates_FORTH) {
+            state = PointGuardStates_BACK;
+        } else {
+            state = PointGuardStates_ALARM;
+        }
+
+        animTime = thisUpdate;
+        dtAng = 0;
+    } else {
+        dtAng = (thisUpdate - animTime) / (float) rotTime;
+        dtAng = tweenInOut(dtAng);
     }
 
-    if (angle < 0) {
+    switch (state) {
+        case PointGuardStates_ALARM:
+            angle = atan2(player->gY() - y, player->gX() - x);
+            break;
+        case PointGuardStates_BACK:
+            angle = lerpAng(startAng, endAng, 1 - dtAng, clockwise);
+            break;
+        case PointGuardStates_FORTH: // From start to end
+            angle = lerpAng(startAng, endAng, dtAng, clockwise);
+            break;
+    }
+
+    // Convert angle to [0, 2pi] domain
+    while (angle > 2 * pi) {
+        angle -= 2 * pi;
+    }
+    while (angle < 0) {
         angle += 2 * pi;
     }
 
-    look(player, level);
+    look(player, level, true);
+    if (spotted) state = PointGuardStates_ALARM;
 
     lastUpdate = thisUpdate;
 
@@ -47,29 +86,25 @@ int cPointGuard::render(SDL_Surface* dst, cLevel* level, bool los) {
 
     tc = level->toScreen(tc);
 
-    if (!spotted) applySurface(sGuard, dst, tc.x - sGuard->w / 2, tc.y - sGuard->h / 2);
-
-    coord l;
-    float length = 200.0;
     if (los) {
-        // Draw Line of Sight
-        l.x = x + cos(angle) * length;
-        l.y = y + sin(angle) * length;
-        l = level->toScreen(l);
-        lineRGBA(dst, tc.x, tc.y, l.x, l.y, 255, 0, 0, 255);
-
-        // Edge line
-        l.x = x + cos(angle + GUARD_FOV / 2.0) * length;
-        l.y = y + sin(angle + GUARD_FOV / 2.0) * length;
-        l = level->toScreen(l);
-        lineRGBA(dst, tc.x, tc.y, l.x, l.y, 255, 0, 0, 255);
-
-        // Other edge
-        l.x = x + cos(angle - GUARD_FOV / 2.0) * length;
-        l.y = y + sin(angle - GUARD_FOV / 2.0) * length;
-        l = level->toScreen(l);
-        lineRGBA(dst, tc.x, tc.y, l.x, l.y, 255, 0, 0, 255);
+        drawLOS(dst, level, x, y, angle, GUARD_FOV, 200);
     }
+
+    applySurface(sGuard, dst, tc.x - sGuard->w / 2, tc.y - sGuard->h / 2);
+
+    return 0;
+}
+
+int cPointGuard::pause() {
+    paused = true;
+    pauseTime = SDL_GetTicks();
+
+    return 0;
+}
+
+int cPointGuard::resume() {
+    paused = false;
+    animTime = SDL_GetTicks() - (pauseTime - animTime);
 
     return 0;
 }

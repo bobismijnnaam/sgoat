@@ -7,6 +7,13 @@
 #include "cPlayer.h"
 #include "cAI.h"
 
+enum InGameStates {
+    InGameStates_GAME = 0,
+    InGameStates_PAUSED,
+    InGameStates_WON,
+    InGameStates_LOSS
+} ;
+
 class gsGame : public cGameState {
 public:
     gsGame(int flvl);
@@ -21,17 +28,21 @@ private:
 
     int mx, my;
 
-    int clr;
-    int N;
-    int x1, y1, x2, y2;
-    SDL_Rect* rect;
-
-    bool rayTest;
-    coord hit;
+    InGameStates state;
 
     cPlayer* player;
     cLevel* level;
     cAI* ai;
+    SDL_Surface* sBG;
+
+    cButtonSet* pauseButtons;
+    cButtonSet* endButtons;
+
+    SDL_Surface* sPaused;
+    SDL_Surface* sLost;
+    SDL_Surface* sWon;
+
+    int lossWinTime;
 
 } ;
 

@@ -7,10 +7,14 @@
 
 #include "cLevel.h"
 
+float toAng(float s, float e, float t);
+float lerpAng(float f, float s, float t, bool clockwise);
+float tweenInOut(float t);
 int Bmin(int f, int s);
 int Bmax(int f, int s);
 float Bmin(float f, float s);
 float Bmax(float f, float s);
+float diffAng(float f, float s);
 
 int cross(SDL_Surface* dst, int x, int y, int size, int r, int g, int b, int a);
 bool lineline(int L1X1, int L1Y1, int L1X2, int L1Y2, int L2X1, int L2Y1, int L2X2, int L2Y2, int* X, int* Y);

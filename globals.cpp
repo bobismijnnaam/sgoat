@@ -8,3 +8,4 @@ cGameMan* gm = NULL;
 TTF_Font* fIntro = NULL;
 TTF_Font* fButton = NULL;
 TTF_Font* fSmall = NULL;
+TTF_Font* fBig = NULL;
