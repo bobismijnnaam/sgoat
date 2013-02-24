@@ -1,5 +1,6 @@
 #include <SDL/SDL.h>
 
+#include "constants.h"
 #include "functions.h"
 #include "globals.h"
 #include "gsLvlSelect.h"
@@ -50,6 +51,13 @@ int gsLvlSelect::events() {
 int gsLvlSelect::logic() {
     if (buttons->gReleased() == 1) {
         gm->setNextState(STATE_GAME);
+        gm->lvl = LEVEL_OUVERTURE;
+    }
+
+    int chosenLvl = buttons->gReleased();
+    if (chosenLvl > 0) {
+        gm->setNextState(STATE_GAME);
+        gm->lvl = chosenLvl;
     }
 
     if (bBack->gReleased() == 1) {

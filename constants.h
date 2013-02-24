@@ -14,4 +14,10 @@ const int PLAYER_SPDNORMAL = 200;
 const int PLAYER_SPDSNEAK = 70;
 const int PLAYER_GOTOUT = 1;
 
+const int LEVEL_OUVERTURE = 1;
+const int LEVEL_ANACRUSIS = 2;
+const int LEVEL_CRESCENDO = 3;
+const int LEVEL_LEDGERLINES = 4;
+const int LEVEL_TUTORIAL = 5;
+
 #endif

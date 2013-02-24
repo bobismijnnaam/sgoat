@@ -47,6 +47,8 @@ public:
     int logic(cPlayer* player);
     int render(SDL_Surface* dst);
 
+    int getEdge(int edge);
+
 private:
     std::vector<SDL_Rect> walls;
     SDL_Rect borders[4];
@@ -63,6 +65,8 @@ private:
     enumDir dir;
 
     cLineRectISCT lineRect;
+
+    int edges[4];
 
     bool dirOn;
 } ;

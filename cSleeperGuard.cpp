@@ -13,6 +13,7 @@ cSleeperGuard::cSleeperGuard(int X, int Y, int Range, SDL_Surface* guardImg) {
 
     sGuard = guardImg;
     state = SleeperGuardStates_SLEEP;
+    paused = false;
 }
 
 cSleeperGuard::~cSleeperGuard() {

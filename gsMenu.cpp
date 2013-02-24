@@ -1,5 +1,6 @@
 #include <SDL/SDL.h>
 
+#include "constants.h"
 #include "functions.h"
 #include "globals.h"
 #include "gsMenu.h"
@@ -52,7 +53,8 @@ int gsMenu::logic() {
         break;
     case 2:
         buttons->moveOut();
-        targetState = STATE_HELP;
+        targetState = STATE_GAME;
+        gm->lvl = LEVEL_TUTORIAL;
         break;
     case 3:
         // Iets met about;

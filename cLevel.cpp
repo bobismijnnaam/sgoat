@@ -35,6 +35,11 @@ cLevel::cLevel(SDL_Surface* dst, int t, int r, int b, int l, cPlayer* player) {
     playerPOI[1] = player->gPlayerEnd();
     sEntrance = loadImage("Media/Graphics/entrance.png");
     sExit = loadImage("Media/Graphics/exit.png");
+
+    edges[0] = t;
+    edges[1] = r;
+    edges[2] = b;
+    edges[3] = l;
 }
 
 cLevel::~cLevel() {
@@ -270,4 +275,8 @@ coord cLevel::toWorld(coord p) {
     np.y = p.y + vp.y;
 
     return np;
+}
+
+int cLevel::getEdge(int edge) {
+    return edges[edge];
 }

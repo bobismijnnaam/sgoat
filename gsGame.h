@@ -33,9 +33,13 @@ private:
     cPlayer* player;
     cLevel* level;
     cAI* ai;
+
     SDL_Surface* sBG;
+    bool bgEnabled;
 
     cButtonSet* pauseButtons;
+    SDL_Surface* sPause;
+
     cButtonSet* endButtons;
 
     SDL_Surface* sPaused;
