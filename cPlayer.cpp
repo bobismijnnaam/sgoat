@@ -54,6 +54,9 @@ int cPlayer::events(SDL_Event* event) {
             case SDLK_LSHIFT:
                 speed = PLAYER_SPDSNEAK;
                 break;
+            case SDLK_SPACE:
+                // speed = 5 * PLAYER_SPDNORMAL;
+                break;
         }
     } else if (event->type == SDL_KEYUP) {
         switch (event->key.keysym.sym) {
@@ -69,6 +72,7 @@ int cPlayer::events(SDL_Event* event) {
             case SDLK_d:
                 if (xvel > 0) xvel = 0;
                 break;
+            case SDLK_SPACE:
             case SDLK_LSHIFT:
                 speed = PLAYER_SPDNORMAL;
                 break;

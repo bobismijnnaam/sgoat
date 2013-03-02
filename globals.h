@@ -6,7 +6,8 @@
 
 #include "gamestate.h"
 
-extern  SDL_Surface* screen;
+extern SDL_Surface* screen;
+extern SDL_Surface* commonBG;
 
 extern cGameMan* gm;
 

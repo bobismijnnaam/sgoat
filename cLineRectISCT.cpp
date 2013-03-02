@@ -17,6 +17,12 @@ int cLineRectISCT::setRect(SDL_Rect* srcRect) {
     return 0;
 }
 
+int cLineRectISCT::setRect(SDL_Rect srcRect) {
+    rect = srcRect;
+
+    return 0;
+}
+
 int cLineRectISCT::setLine(int X1, int Y1, int X2, int Y2) { // Set the line coordinates
     lx1 = X1;
     ly1 = Y1;
@@ -75,7 +81,7 @@ bool cLineRectISCT::calc() { // Calculate the two intersection points. Returns t
                 y1 = ty;
                 ctr = 1;
             } else {
-                if (tx != x1 && ty != y1) {
+                if (!(tx == x1 && ty == y1)) { // Oud: tx != x1 && ty != y1
                     x2 = tx;
                     y2 = ty;
                     ctr = 2;

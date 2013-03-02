@@ -17,6 +17,8 @@ private:
     cButtonSet* buttons;
     cButtonSet* bBack;
 
+    SDL_Surface* sHeader;
+
     GameStates targetState;
 
 } ;

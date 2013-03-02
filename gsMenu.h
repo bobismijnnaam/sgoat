@@ -17,6 +17,13 @@ public:
 
 private:
     SDL_Surface* bg;
+    SDL_Surface* sT;
+    SDL_Surface* sHeader;
+    SDL_Surface* sAbout;
+
+    int mx, my;
+    int ox, oy;
+    bool disp;
 
     cButtonSet* buttons;
 

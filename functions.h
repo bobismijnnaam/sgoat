@@ -7,6 +7,7 @@
 
 #include "cLevel.h"
 
+int applyTile(SDL_Surface* src, SDL_Surface* dst, int x, int y, int w, int h, int offx, int offy);
 float toAng(float s, float e, float t);
 float lerpAng(float f, float s, float t, bool clockwise);
 float tweenInOut(float t);

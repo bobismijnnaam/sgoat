@@ -48,10 +48,12 @@ public:
     int render(SDL_Surface* dst);
 
     int getEdge(int edge);
+    SDL_Rect getVP();
 
 private:
     std::vector<SDL_Rect> walls;
     SDL_Rect borders[4];
+    SDL_Surface* sWall;
 
     coord playerPOI[2];
     SDL_Surface* sEntrance;
@@ -70,5 +72,7 @@ private:
 
     bool dirOn;
 } ;
+
+int placeCoolers (int x, int y, int n, cLevel* level);
 
 #endif

@@ -5,11 +5,215 @@
 #include <SDL/SDL_image.h>
 #include <string>
 #include <sstream>
+#include <iostream>
 
 #include "cLevel.h"
 #include "constants.h"
 #include "functions.h"
 #include "globals.h"
+
+int applyTile(SDL_Surface* src, SDL_Surface* dst, int x, int y, int w, int h, int offx, int offy) {
+    if (w <= src->w - offx && h <= src->h - offy) { //Only small part of image
+        SDL_Rect t;
+        t.x = offx;
+        t.y = offy;
+        t.w = w;
+        t.h = h;
+        applyClipped(src, dst, x, y, &t);
+    } else if (h <= src->h - offy) { // Only one horizontal row
+        int sx = 0;
+        int tw = 0;
+        SDL_Rect t;
+
+        t.x = offx;
+        t.y = offy;
+        t.w = src->w - offx;
+        t.h = h;
+
+        applyClipped(src, dst, x, y, &t); // First offsetted tile
+        sx = src->w - offx;
+
+        t.x = 0;
+
+        while (sx < w) {
+            tw = Bmin(w - sx, src->w);
+            t.w = tw;
+            applyClipped(src, dst, x + sx, y, &t);
+            sx += tw;
+        }
+    } else if (w <= src->w - offx) { // Only one vertical row
+        int sy = 0;
+        int th = src->h - offy;
+        SDL_Rect t;
+
+        t.x = offx;
+        t.y = offy;
+        t.w = w;
+        t.h = th;
+
+        applyClipped(src, dst, x, y, &t); // First offsetted tile
+        sy = th;
+
+        t.y = 0;
+
+        while (sy < h) {
+            th = Bmin(h - sy, src->h);
+            t.h = th;
+            applyClipped(src, dst, x, y + sy, &t);
+            sy += th;
+        }
+    } else { // More than one horizontal and more than one vertical
+        int sx = 0, sy = 0;
+        int fw = src->w - offx, fh = src->h - offy;
+        int tilew = 0, tileh = 0;
+        SDL_Rect t;
+
+        t.x = offx;
+        t.y = offy;
+        t.w = fw;
+        t.h = fh;
+
+        applyClipped(src, dst, x, y, &t); // First top left part
+        sx = fw;
+        t.x = 0;
+
+        while (sx < w) { // First row starting from second tile
+            tilew = Bmin(w - sx, src->w);
+            t.w = tilew;
+            applyClipped(src, dst, x + sx, y, &t);
+            sx += tilew;
+        }
+
+        sx = 0;
+        sy += fh;
+        t.y = 0;
+
+        while (sy < h) { // Rest of the rows
+            tileh = Bmin(h - sy, src->h);
+            t.h = tileh;
+            t.x = offx;
+            t.w = fw;
+            applyClipped(src, dst, x, y + sy, &t);
+
+            t.x = 0;
+            sx += fw;
+
+            while (sx < w) {
+                tilew = Bmin(w - sx, src->w);
+                t.w = tilew;
+                applyClipped(src, dst, x + sx, y + sy, &t);
+                sx += tilew;
+            }
+
+            sx = 0;
+            sy += tileh;
+        }
+    }
+
+    return 0;
+}
+
+/*
+int sx = 0;
+    int sy = 0;
+    SDL_Rect tr;
+    SDL_Rect to;
+    tr.x = 0;
+    tr.y = 0;
+    tr.w = src->w;
+    tr.h = src->h;
+
+    // First row if offsetted
+    if (offx > 0 || offy > 0) {
+        // First of all!
+        tr.x = offx;
+        tr.y = offy;
+        tr.w = Bmin(src->w - offx, w);
+        tr.h = Bmin(src->h - offy, h);
+
+        applyClipped(src, dst, x, y, &tr);
+
+        sx = src->w - offx;
+        tr.x = 0;
+        tr.w = src->w;
+
+        if (!(w <= Bmin(src->w - offx, w))) {
+
+        // Rest of first row
+        while (x + w - sx > src->w) {
+            applyClipped(src, dst, x + sx, y, &tr);
+            sx += src->w;
+        }
+
+        tr.w = x + w - sx;
+        applyClipped(src, dst, x + sx, y, &tr);
+
+        }
+
+        sx = 0;
+        sy = src->h - offy;
+
+        tr.y = 0;
+        tr.h = src->h;
+    }
+
+    if (h <= Bmin(src->h - offy, h)) return 0;
+
+    // Normal routine
+    while (y + h - sy > src->h) {
+        if (offx > 0) {
+            tr.x = offx;
+            tr.w = Bmin(src->w - offx, w);
+
+            applyClipped(src, dst, x, y + sy, &tr);
+            sx = src->w - offx;
+        }
+
+        if (!(w <= Bmin(src->w - offx, w))) {
+
+        while (x + w - sx > src->w) {
+            applySurface(src, dst, x + sx, y + sy);
+            sx += src->w;
+        }
+
+        tr.x = 0;
+        tr.w = x + w - sx;
+        applyClipped(src, dst, x + sx, y + sy, &tr);
+
+        }
+
+        sy += src->h;
+        sx = 0;
+    }
+
+    tr.h = y + h - sy;
+
+    to = tr;
+
+    // First of last row
+    if (offx > 0) {
+        tr.x = offx;
+        tr.w = Bmin(src->w - offx, w);
+        applyClipped(src, dst, x, y + sy, &tr);
+        sx = tr.w;
+
+        if (Bmin(src->w - offx, w) == w) return 0;
+    }
+
+    tr.x = 0;
+    tr.w = src->w;
+
+    // Last row
+    while (x + w - sx > src->w) {
+        applyClipped(src, dst, x + sx, y + sy, &tr);
+        sx += src->w;
+    }
+
+    // Bottom right corner
+    to.w = Bmin(x + w - sx, w);
+    applyClipped(src, dst, x + sx, y + sy, &to);
+    return 0;
+*/
 
 // http://math.stackexchange.com/questions/110080/shortest-way-to-achieve-target-angle
 float toAng(float s, float e, float t) { // Moves to shortest angle
@@ -163,13 +367,45 @@ int Bmax(int f, int s) { // Returns highest
 
 // http://en.wikipedia.org/wiki/Line-line_intersection
 bool lineline(int L1X1, int L1Y1, int L1X2, int L1Y2, int L2X1, int L2Y1, int L2X2, int L2Y2, int* X, int* Y) { // Returns the point of intersection of two lines
-    int D = (L1X1 - L1X2) * (L2Y1 - L2Y2) - (L1Y1 - L1Y2) * (L2X1 - L2X2); // Denominator. If zero then no intersection
+    long long l1x1, l1y1, l1x2, l1y2;
+    long long l2x1, l2y1, l2x2, l2y2;
+
+    long long tlX, trX;
+    long long tlY, trY;
+
+    long long x, y;
+
+    l1x1 = L1X1;
+    l1y1 = L1Y1;
+    l1x2 = L1X2;
+    l1y2 = L1Y2;
+    l2x1 = L2X1;
+    l2y1 = L2Y1;
+    l2x2 = L2X2;
+    l2y2 = L2Y2;
+
+    long long D = (l1x1 - l1x2) * (l2y1 - l2y2) - (l1y1 - l1y2) * (l2x1 - l2x2); // Denominator. If zero then no intersection
 
     if (D == 0) { // Parallel and possibly overlapping
         return false;
     } else {
+        tlX = (l1x1 * l1y2 - l1y1 * l1x2) * (l2x1 - l2x2);
+        trX = (l1x1 - l1x2) * (l2x1 * l2y2 - l2y1 * l2x2);
+        x = (tlX - trX) / D;
+
+        tlY = (l1x1 * l1y2 - l1y1 * l1x2) * (l2y1 - l2y2);
+        trY = (l1y1 - l1y2) * (l2x1 * l2y2 - l2y1 * l2x2);
+        y = (tlY - trY) / D;
+
+        *X = x;
+        *Y = y;
+
+        /*
         *X = ( (L1X1 * L1Y2 - L1Y1 * L1X2) * (L2X1 - L2X2) - (L1X1 - L1X2) * (L2X1 * L2Y2 - L2Y1 * L2X2) ) / D; // Calculate x
         *Y = ( (L1X1 * L1Y2 - L1Y1 * L1X2) * (L2Y1 - L2Y2) - (L1Y1 - L1Y2) * (L2X1 * L2Y2 - L2Y1 * L2X2) ) / D; // Calculate y
+        */
+
+        // std::cout << D << " | " << *X << " | " << *Y << "\n";
 
         if (*X >= Bmin(L1X1, L1X2) && *X <= Bmax(L1X1, L1X2) && *Y >= Bmin(L1Y1, L1Y2) && *Y <= Bmax(L1Y1, L1Y2)) {
             // Intersection is on first line

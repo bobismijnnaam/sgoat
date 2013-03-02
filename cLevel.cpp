@@ -40,11 +40,14 @@ cLevel::cLevel(SDL_Surface* dst, int t, int r, int b, int l, cPlayer* player) {
     edges[1] = r;
     edges[2] = b;
     edges[3] = l;
+
+    sWall = loadImage("Media/Graphics/paper.jpg");
 }
 
 cLevel::~cLevel() {
     SDL_FreeSurface(sEntrance);
     SDL_FreeSurface(sExit);
+    SDL_FreeSurface(sWall);
 }
 
 bool cLevel::raycast(int x1, int y1, int x2, int y2, bool checkBorders) { // Returns collision closest to (x1, y1)!
@@ -81,11 +84,13 @@ bool cLevel::raycast(int x1, int y1, int x2, int y2, bool checkBorders) { // Ret
             if (lineRect.calc()) {
                 ret = true;
                 N = lineRect.get(&t1x, &t1y, &t2x, &t2y);
-                tc = {t1x, t1y};
+                tc.x = t1x;
+                tc.y = t1y;
                 points.push_back(tc);
 
                 if (N == 2) {
-                    tc = {t2x, t2y};
+                    tc.x = t2x;
+                    tc.y = t2y;
                     points.push_back(tc);
                 }
             }
@@ -94,22 +99,15 @@ bool cLevel::raycast(int x1, int y1, int x2, int y2, bool checkBorders) { // Ret
 
     // std::cout << points.size() << "\n"; // More leftovers
 
-    // Find the point closest to (x1, x2) and mark it as the first collision point.
+    // Find the point closest to (x1, y1) and mark it as the first collision point.
     // This point can later be retrieved with getRayHit()
-    int closest, cDist;
+    int closest = -1, cDist = 9999999999999999;
     int dx, dy, dist2;
 
-    if (points.size() > 0) {
-        dx = x1 - points[0].x;
-        dy = y1 - points[0].y;
-        dist2 = dx * dx + dy * dy;
-
-        closest = 0;
-        cDist = dist2;
-
-        for (int i = 1; i < points.size(); ++i) {
-            dx = x1 - points[i].x;
-            dy = y1 - points[i].y;
+    if (ret) {
+        for (int i = 0; i < points.size(); ++i) {
+            dx = points[i].x - x1;
+            dy = points[i].y - y1;
             dist2 = dx * dx + dy * dy;
 
             if (dist2 < cDist) {
@@ -258,6 +256,11 @@ int cLevel::dispWall(SDL_Surface* dst, SDL_Rect* w, SDL_Rect* vp) {
 
     SDL_FillRect(dst, &dstRect, wallclr);
 
+    coord wc = {w->x, w->y};
+    wc = toScreen(wc);
+
+    applyTile(sWall, dst, wc.x, wc.y, w->w, w->h, 0, 0);
+
     return 0;
 }
 
@@ -279,4 +282,18 @@ coord cLevel::toWorld(coord p) {
 
 int cLevel::getEdge(int edge) {
     return edges[edge];
+}
+
+SDL_Rect cLevel::getVP() {
+    return vp;
+}
+
+int placeCoolers(int x, int y, int n, cLevel* level) {
+    int wx;
+    for (int i = 0; i < n; ++i) {
+        wx = x + i * 2 * 75;
+        level->addWall(y, wx + 75, y + 10 * 75, wx);
+    }
+
+    return 0;
 }

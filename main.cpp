@@ -5,6 +5,7 @@
 #include <SDL/SDL_ttf.h>
 
 #include "constants.h"
+#include "functions.h"
 #include "globals.h"
 
 int init() {
@@ -15,13 +16,15 @@ int init() {
     TTF_Init();
 
     fIntro = TTF_OpenFont("Media/Fonts/PressStart2P.ttf", 15);
-    fButton = TTF_OpenFont("Media/Fonts/PressStart2P.ttf", 30);
-    fSmall = TTF_OpenFont("Media/Fonts/PressStart2P.ttf", 10);
-    fBig = TTF_OpenFont("Media/Fonts/PressStart2P.ttf", 30);
+    fButton = TTF_OpenFont("Media/Fonts/vSHandprinted.otf", 30);
+    fSmall = TTF_OpenFont("Media/Fonts/vSHandprinted.otf", 10);
+    fBig = TTF_OpenFont("Media/Fonts/vSHandprinted.otf", 30);
 
     screen = SDL_SetVideoMode(SCR_W, SCR_H, SCR_BPP, SDL_SWSURFACE);
 
     SDL_WM_SetCaption("Operation Get Out | Knights of the Compiler", NULL);
+
+    commonBG = loadImage("Media/Graphics/commonbg.png");
 
     gm = new cGameMan(STATE_INTRO);
 
@@ -53,6 +56,8 @@ int quit() {
     TTF_CloseFont(fButton);
     TTF_CloseFont(fSmall);
     TTF_CloseFont(fBig);
+
+    SDL_FreeSurface(commonBG);
 
     TTF_Quit();
 

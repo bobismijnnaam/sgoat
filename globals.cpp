@@ -2,6 +2,7 @@
 #include "gamestate.h"
 
 SDL_Surface* screen = NULL;
+SDL_Surface* commonBG = NULL;
 
 cGameMan* gm = NULL;
 

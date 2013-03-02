@@ -6,23 +6,25 @@
 #include "gsLvlSelect.h"
 
 gsLvlSelect::gsLvlSelect() {
-    Uint32 nclr = SDL_MapRGB(screen->format, 255, 255, 255);
+    Uint32 nclr = SDL_MapRGB(screen->format, 0, 0, 0);
     Uint32 hclr = SDL_MapRGB(screen->format, 0, 150, 0);
-    buttons = new cButtonSet(fButton, true, B_NULL, 100, 100, 0, 50, 500, 100, DIR_LEFT, nclr, hclr, screen->format);
-    bBack = new cButtonSet(fButton, true, B_NULL, 100, 500, 0, 50, 500, 100, DIR_LEFT, nclr, hclr, screen->format);
+    buttons = new cButtonSet(fButton, true, B_NULL, 115, 205, 0, 65, 500, 100, DIR_LEFT, nclr, hclr, screen->format);
+    bBack = new cButtonSet(fButton, true, B_NULL, 120, 475, 0, 50, 500, 100, DIR_LEFT, nclr, hclr, screen->format);
 
     buttons->addB("Ouverture");
     buttons->addB("Anacrusis");
     buttons->addB("Crescendo");
-    buttons->addB("Ledger Lines");
 
     bBack->addB("Back");
 
     targetState = STATE_NULL;
+
+    sHeader = loadImage("Media/Graphics/selectalevel.png");
 }
 
 gsLvlSelect::~gsLvlSelect() {
     delete buttons;
+    SDL_FreeSurface(sHeader);
 }
 
 int gsLvlSelect::events() {
@@ -73,6 +75,10 @@ int gsLvlSelect::logic() {
 
 int gsLvlSelect::render(SDL_Surface* dst) {
     fresh(dst, true);
+
+    applySurface(commonBG, dst, 0, 0);
+
+    applySurface(sHeader, dst, 113, 115);
 
     buttons->render(dst);
 

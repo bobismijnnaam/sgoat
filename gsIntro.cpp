@@ -8,7 +8,7 @@ gsIntro::gsIntro() {
     sdl = loadImage("Media/Graphics/sdl.gif");
     ogam = loadImage("Media/Graphics/1gam.png");
 
-    logo = new cKnightsLogo(true, true, fIntro);
+    logo = new cKnightsLogo(false, true, fIntro);
 
     introTime = SDL_GetTicks();
 }
@@ -46,7 +46,9 @@ int gsIntro::logic() {
 int gsIntro::render(SDL_Surface* dst) {
     fresh(dst, true);
 
-    logo->render(dst, 230, 50);
+    applySurface(commonBG, dst, 0, 0);
+
+    logo->render(dst, 230, 70);
 
     applySurface(sdl, dst, 130, 450);
     applySurface(ogam, dst, 430, 420);
